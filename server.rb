@@ -18,11 +18,14 @@ def request_headers(socket)
   headers
 end
 
+def get_method(headers)
+  method_line = headers.first
+  return unless method_line
 
-# Content-Length分取得
-#
+  method_line.split(' ')[0]
+end
+
 def request_body(socket, headers)
-  # 本来ならPOSTかどうかもみようか
   length_header = headers.find { |header| header.include? 'Content-Length' }
   return unless length_header
 
@@ -30,12 +33,21 @@ def request_body(socket, headers)
   socket.read(size)
 end
 
-def render(socket)
-  socket.puts 'HTTP/1.1 200 OK'
-  # 試しにtext/plainにするとどうなる
-  socket.puts 'Content-Type: text/html'
-  socket.puts
-  socket.puts '<html><h1>Test</h1></html>'
+def render(socket, method)
+  case method
+  when 'GET'
+    socket.puts 'HTTP/1.1 200 OK'
+    socket.puts 'Content-Type: text/html'
+    socket.puts
+    socket.puts '<html><h1>GET</h1></html>'
+  when 'POST'
+    socket.puts 'HTTP/1.1 200 OK'
+    socket.puts 'Content-Type: text/html'
+    socket.puts
+    socket.puts '<html><h1>POST</h1></html>'
+  else
+    redirect(socket)
+  end
 end
 
 def redirect(socket)
@@ -54,11 +66,15 @@ loop do
     p '------header------'
     p headers
 
+    method = get_method(headers)
+    p '------method--------'
+    p method
+
     body = request_body(socket, headers)
     p '------body--------'
     p body
 
-    render(socket)
+    render(socket, method)
 
     socket.close
   end

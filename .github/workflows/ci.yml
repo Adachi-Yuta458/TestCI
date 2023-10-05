@@ -1,9 +1,12 @@
-name: Manual trigger with input
+name: Manual Curl URL
 
 on:
   workflow_dispatch:
     inputs:
-      target_url:
+      httpMethod:
+        description: 'HTTP Method'
+        required: true
+      url:
         description: 'input URL'
         required: true
 
@@ -13,7 +16,7 @@ jobs:
     steps:
     - name: request-curl
       run: |
-        curl -s ${{ github.event.inputs.target_url }} > response.txt
+        curl -X ${{ github.event.inputs.httpMethod }} ${{ github.event.inputs.url }} > response.txt
 
     - name: Upload response as artifact
       uses: actions/upload-artifact@v2
