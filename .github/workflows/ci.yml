@@ -4,15 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       target_url:
-        description: 'URL for curl'
+        description: 'input URL'
         required: true
 
 jobs:
-  run-curl:
+  request-curl:
     runs-on: ubuntu-latest
     steps:
-    - name: Run curl
-      run: curl ${{ github.event.inputs.target_url }}
+    - name: request-curl
+      run: |
+        curl -s ${{ github.event.inputs.target_url }} > response.txt
 
     - name: Upload response as artifact
       uses: actions/upload-artifact@v2
